@@ -1,6 +1,7 @@
 package com.eazybytes.cards.cards.controller;
 
 import com.eazybytes.cards.cards.constants.CardsConstants;
+import com.eazybytes.cards.cards.dto.CardsContactInfoDto;
 import com.eazybytes.cards.cards.dto.CardsDto;
 import com.eazybytes.cards.cards.dto.ErrorResponseDto;
 import com.eazybytes.cards.cards.dto.ResponseDto;
@@ -14,6 +15,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,11 +30,24 @@ import org.springframework.web.bind.annotation.*;
 )
 @RestController
 @RequestMapping(path = "/api", produces = {MediaType.APPLICATION_JSON_VALUE})
-@AllArgsConstructor
 @Validated
 public class CardsController {
 
     private ICardsService iCardsService;
+
+    @Value("${build.info}")
+    private String buildInfo;
+
+    @Autowired
+    private Environment environment;
+
+    @Autowired
+    private CardsContactInfoDto cardsContactInfoDto;
+
+
+    public CardsController(ICardsService iCardsService){
+        this.iCardsService = iCardsService;
+    }
 
     @Operation(
             summary = "Create Card REST API",
@@ -155,5 +172,74 @@ public class CardsController {
                     .status(HttpStatus.EXPECTATION_FAILED)
                     .body(new ResponseDto(CardsConstants.STATUS_417, CardsConstants.MESSAGE_417_DELETE));
         }
+    }
+
+    @Operation(
+            summary = "Fetch Build Info details",
+            description = "REST API to fetch build info details"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTTP Status OK"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "HTTP Status Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            )
+    }
+    )
+    @GetMapping(path = "/build-info")
+    public ResponseEntity<String> fetchBuildInfo(){
+        return ResponseEntity.status(HttpStatus.OK).body(buildInfo);
+    }
+
+    @Operation(
+            summary = "Fetch Java Version Details",
+            description = "REST API to fetch Java Version details"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTTP Status OK"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "HTTP Status Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            )
+    }
+    )
+    @GetMapping(path = "/java-version")
+    public ResponseEntity<String> fetchJavaVersion(){
+        return ResponseEntity.status(HttpStatus.OK).body(environment.getProperty("PATH"));
+    }
+
+    @Operation(
+            summary = "Fetch Contact Info Details",
+            description = "REST API to fetch Contact Info details"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTTP Status OK"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "HTTP Status Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            )
+    }
+    )
+    @GetMapping(path = "/contact-info")
+    public ResponseEntity<CardsContactInfoDto> fetchContactInfoDetails(){
+        return ResponseEntity.status(HttpStatus.OK).body(cardsContactInfoDto);
     }
 }
