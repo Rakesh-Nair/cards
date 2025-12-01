@@ -35,7 +35,7 @@ public class CardsController {
 
     private ICardsService iCardsService;
 
-    @Value("${build.info}")
+    @Value("${build.version}")
     private String buildInfo;
 
     @Autowired
