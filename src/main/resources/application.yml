@@ -52,6 +52,12 @@ management:
     health:
       probes:
         enabled: true
+    info:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
 eureka:
   instance:
     preferIpAddress: true
